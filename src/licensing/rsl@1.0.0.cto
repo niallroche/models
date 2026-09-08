@@ -17,7 +17,7 @@ concerto version "^4.0.0"
 
 namespace org.accordproject.licensing.rsl@1.0.0
 
-import org.accordproject.money@1.0.0.{CurrencyCode} from https://models.accordproject.org/money@1.0.0.cto
+import org.accordproject.money@1.0.0.{CurrencyCode, PreciseAmount} from https://models.accordproject.org/money@1.0.0.cto
 
 // ---------------------------------------------------------------------------
 // RSL 1.0 — Really Simple Licensing (RSL Collective)
@@ -60,17 +60,16 @@ import org.accordproject.money@1.0.0.{CurrencyCode} from https://models.accordpr
 //     data that must survive a round trip. The geo, reporting, warranty and
 //     disclaimer vocabularies are closed in Appendix A and are enums alone.
 //
-//  4. This model deliberately carries NO money type beyond CurrencyCode.
-//     <amount> is an ISO 4217 code and a decimal, and that is all RSL can say.
-//     Where a price cannot be expressed that way — a token rail, or any unit
-//     needing an explicit scale — RSL's own answer is <accepts>: section 3.11
-//     provides that authoritative pricing and settlement instructions MAY be
-//     supplied dynamically by the payment protocol at runtime. An exact amount
-//     therefore belongs in the agreement model that sources the payment (an
-//     org.accordproject.money@1.0.0.PreciseAmount on an obligation), or in a
-//     foreign-namespace element, which Appendix A's `foreignElement` rule
-//     admits anywhere. Putting one in the RSL namespace would create a second
-//     price with no XML form and no defined precedence.
+//  4. RSL's own <amount> remains exactly as specified: an ISO 4217 code and an
+//     xsd:decimal. Payment.preciseAmount is a typed Accord extension for exact
+//     units that <amount> cannot represent, such as HBAR and token contracts.
+//     It reuses org.accordproject.money@1.0.0.PreciseAmount, whose Unit carries
+//     a code, scheme, optional identifier and scale. An XML adapter MUST emit
+//     it as a foreign-namespace element, never as an RSL <amount>; Appendix A
+//     admits foreignElement inside <payment>, and RSL Core processors ignore
+//     extensions they do not recognise. Such a payment should also carry
+//     <accepts> so a core RSL client can obtain authoritative pricing and
+//     settlement instructions through the named protocol.
 //
 // What this model cannot enforce, and an adapter must:
 //
@@ -92,6 +91,10 @@ import org.accordproject.money@1.0.0.{CurrencyCode} from https://models.accordpr
 //   - Payment.type and Payment.typeExtension are alternatives — Appendix A's
 //     `paymentToken` is a choice, not a pair — but Concerto cannot express an
 //     exclusive-or, so both can be set. An adapter must reject that.
+//   - Payment.amount and Payment.preciseAmount are also alternatives. The first
+//     is the RSL core element; the second is the Accord foreign extension. An
+//     adapter must reject a payment that sets both rather than choose between
+//     potentially contradictory prices.
 // ---------------------------------------------------------------------------
 
 // Appendix A: qnameToken. An extension-namespace token in a usage, user or
@@ -209,6 +212,10 @@ concept Payment {
   o AbsoluteUri standard optional
   o String custom optional
   o Amount amount optional
+  // Accord extension for an exact fiat, native-chain or token amount. In XML
+  // this is a foreignElement, not an element in the RSL namespace. For HBAR,
+  // for example: code="HBAR", scheme="slip44", identifier="3030", scale=8.
+  o PreciseAmount preciseAmount optional
   o Accepts accepts optional
 }
 

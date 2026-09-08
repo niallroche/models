@@ -186,21 +186,61 @@ test('permits and prohibits are typed fields, not repeated elements', () => {
 });
 
 /**
- * <amount> is an ISO 4217 code and a decimal, and that is the whole of what RSL
- * can say about price. The currency code is Accord's own scalar rather than a
- * duplicate, and nothing in this namespace carries an exact monetary amount —
- * a price RSL cannot express is reached through <accepts> (section 3.11).
+ * Core <amount> stays ISO 4217. Accord-aware integrations can additionally use
+ * the typed preciseAmount foreign extension for an exact non-ISO unit, while
+ * <accepts> remains the RSL Core route to the payment protocol.
  */
-test('amount reuses the Accord currency code and adds no money type', () => {
+test('core amount stays ISO while the Accord extension carries exact HBAR', () => {
     const manager = modelManager();
+    const s = serializer(manager);
     const amount = manager.getType(`${NS}.Amount`);
     assert.match(amount.getProperty('currency').getFullyQualifiedTypeName(), /CurrencyCode$/);
 
     const payment = manager.getType(`${NS}.Payment`);
-    const moneyTyped = payment.getProperties()
-        .map((property) => property.getFullyQualifiedTypeName())
-        .filter((type) => /money@/.test(type));
-    assert.deepEqual(moneyTyped, [], 'Payment must not carry a money type of its own');
+    assert.equal(
+        payment.getProperty('preciseAmount').getFullyQualifiedTypeName(),
+        'org.accordproject.money@1.0.0.PreciseAmount',
+    );
+
+    const hbarPayment = {
+        $class: `${NS}.RslDocument`,
+        contents: [{
+            $class: `${NS}.Content`,
+            url: '/',
+            licenses: [{
+                $class: `${NS}.LicenseTerms`,
+                permitsUsage: ['AI_INPUT'],
+                payment: {
+                    $class: `${NS}.Payment`,
+                    type: 'USE',
+                    preciseAmount: {
+                        $class: 'org.accordproject.money@1.0.0.PreciseAmount',
+                        unscaledValue: '100000000',
+                        unit: {
+                            $class: 'org.accordproject.money@1.0.0.Unit',
+                            code: 'HBAR',
+                            scheme: 'slip44',
+                            identifier: '3030',
+                            scale: 8,
+                        },
+                    },
+                    accepts: {
+                        $class: `${NS}.Accepts`,
+                        type: 'application/x402+json',
+                        metadata: '{"network":"hedera:mainnet","scheme":"exact"}',
+                    },
+                },
+            }],
+        }],
+    };
+    assert.doesNotThrow(() => s.fromJSON(hbarPayment));
+
+    const invalidCoreAmount = structuredClone(hbarPayment);
+    delete invalidCoreAmount.contents[0].licenses[0].payment.preciseAmount;
+    invalidCoreAmount.contents[0].licenses[0].payment.amount = {
+        $class: `${NS}.Amount`, currency: 'HBAR', value: '1.00',
+    };
+    assert.throws(() => s.fromJSON(invalidCoreAmount), /currency/);
 });
 
 /**
