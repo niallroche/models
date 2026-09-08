@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The canonical XML serialisation of rsl-example.json, kept beside it so the
+  model can be read against the form RSL is actually published in. This file is
+  documentation: nothing parses it, and there is no XML adapter in this
+  repository.
+
+  Two licences, neither of which prohibits anything. RSL is read conservatively
+  (section 3.1.1): a use that no applicable licence permits is not licensed, so
+  a prohibition is unnecessary here — and would be actively wrong, because a
+  prohibition in one licence defeats a permit in another for the same asset.
+  Paid training is offered by the second licence; prohibiting ai-train in the
+  first would make that offer unreachable.
+
+  Note what is absent. There is no `server` attribute: when one is present a
+  client MUST obtain a licence from that OLP server before access, even for a
+  free licence (section 3.3), so it must not be advertised unless it is
+  implemented. And the first licence carries no <amount>: the price is
+  denominated on a token rail, which ISO 4217 cannot express, so it is reached
+  through <accepts>, where section 3.11 provides for authoritative pricing to be
+  supplied by the payment protocol at runtime.
+-->
+<rsl xmlns="https://rslstandard.org/rsl" max-age="30">
+  <content url="/reports/digital-assets-outlook-2026">
+    <license>
+      <permits type="usage">search ai-input ai-index</permits>
+      <permits type="user">commercial non-commercial education government personal</permits>
+      <payment type="use">
+        <custom>https://example.com/licensing</custom>
+        <accepts type="application/x402+json"><![CDATA[{"network":"eip155:84532","scheme":"exact"}]]></accepts>
+      </payment>
+      <legal type="warranty">ownership authority no-infringement</legal>
+      <legal type="disclaimer">as-is no-warranty</legal>
+      <legal type="attestation">true</legal>
+      <legal type="contact">mailto:licensing@example.com</legal>
+    </license>
+    <license>
+      <permits type="usage">ai-train</permits>
+      <permits type="user">commercial non-commercial education government personal</permits>
+      <payment type="training">
+        <custom>https://example.com/licensing/training</custom>
+        <amount currency="USD">50.00</amount>
+      </payment>
+      <legal type="warranty">ownership authority no-infringement</legal>
+      <legal type="disclaimer">as-is no-warranty</legal>
+      <legal type="attestation">true</legal>
+      <legal type="contact">mailto:licensing@example.com</legal>
+    </license>
+    <copyright type="organization" contactUrl="https://example.com/contact">Example Media LLC</copyright>
+    <terms>https://example.com/legal/content-access-terms</terms>
+  </content>
+</rsl>

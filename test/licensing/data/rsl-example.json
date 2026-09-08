@@ -1,0 +1,96 @@
+{
+  "$class": "org.accordproject.licensing.rsl@1.0.0.RslDocument",
+  "maxAgeDays": 30,
+  "contents": [
+    {
+      "$class": "org.accordproject.licensing.rsl@1.0.0.Content",
+      "url": "/reports/digital-assets-outlook-2026",
+      "encrypted": false,
+      "licenses": [
+        {
+          "$class": "org.accordproject.licensing.rsl@1.0.0.LicenseTerms",
+          "permitsUsage": [
+            "SEARCH",
+            "AI_INPUT",
+            "AI_INDEX"
+          ],
+          "permitsUser": [
+            "COMMERCIAL",
+            "NON_COMMERCIAL",
+            "EDUCATION",
+            "GOVERNMENT",
+            "PERSONAL"
+          ],
+          "payment": {
+            "$class": "org.accordproject.licensing.rsl@1.0.0.Payment",
+            "type": "USE",
+            "custom": "https://example.com/licensing",
+            "accepts": {
+              "$class": "org.accordproject.licensing.rsl@1.0.0.Accepts",
+              "type": "application/x402+json",
+              "metadata": "{\"network\":\"eip155:84532\",\"scheme\":\"exact\"}"
+            }
+          },
+          "legal": {
+            "$class": "org.accordproject.licensing.rsl@1.0.0.LegalStatements",
+            "warranty": [
+              "OWNERSHIP",
+              "AUTHORITY",
+              "NO_INFRINGEMENT"
+            ],
+            "disclaimer": [
+              "AS_IS",
+              "NO_WARRANTY"
+            ],
+            "attestation": true,
+            "contact": "mailto:licensing@example.com"
+          }
+        },
+        {
+          "$class": "org.accordproject.licensing.rsl@1.0.0.LicenseTerms",
+          "permitsUsage": [
+            "AI_TRAIN"
+          ],
+          "permitsUser": [
+            "COMMERCIAL",
+            "NON_COMMERCIAL",
+            "EDUCATION",
+            "GOVERNMENT",
+            "PERSONAL"
+          ],
+          "payment": {
+            "$class": "org.accordproject.licensing.rsl@1.0.0.Payment",
+            "type": "TRAINING",
+            "custom": "https://example.com/licensing/training",
+            "amount": {
+              "$class": "org.accordproject.licensing.rsl@1.0.0.Amount",
+              "currency": "USD",
+              "value": "50.00"
+            }
+          },
+          "legal": {
+            "$class": "org.accordproject.licensing.rsl@1.0.0.LegalStatements",
+            "warranty": [
+              "OWNERSHIP",
+              "AUTHORITY",
+              "NO_INFRINGEMENT"
+            ],
+            "disclaimer": [
+              "AS_IS",
+              "NO_WARRANTY"
+            ],
+            "attestation": true,
+            "contact": "mailto:licensing@example.com"
+          }
+        }
+      ],
+      "copyright": {
+        "$class": "org.accordproject.licensing.rsl@1.0.0.Copyright",
+        "name": "Example Media LLC",
+        "type": "ORGANIZATION",
+        "contactUrl": "https://example.com/contact"
+      },
+      "terms": "https://example.com/legal/content-access-terms"
+    }
+  ]
+}
