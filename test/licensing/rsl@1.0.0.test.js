@@ -231,10 +231,15 @@ test('core amount stays ISO while the Accord extension carries exact HBAR', () =
         scale: 8,
     });
     assert.deepEqual(preciseAmount.unit, slip44Registry.units.HBAR);
-    assert.equal(
+    const protocolMetadata = JSON.parse(
         hbarPayment.contents[0].licenses[0].payment.accepts.metadata,
-        '{"network":"hedera:testnet","scheme":"exact","asset":"0.0.0"}',
     );
+    assert.deepEqual(protocolMetadata, {
+        network: 'hedera:testnet',
+        scheme: 'exact',
+        asset: '0.0.0',
+    });
+    assert.notEqual(protocolMetadata.asset, preciseAmount.unit.identifier);
     assert.doesNotThrow(() => s.fromJSON(hbarPayment));
 
     const invalidCoreAmount = structuredClone(hbarPayment);

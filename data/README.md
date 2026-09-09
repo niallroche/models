@@ -61,7 +61,10 @@ This represents exactly `0.0005 HBAR`. Network selection (for example,
 `hedera:testnet`) belongs in the payment protocol metadata; it is not part of
 the SLIP-0044 currency unit identity. Likewise, Hedera x402 uses `0.0.0` as its
 rail-specific asset value for native HBAR; that value belongs in the x402
-payment requirements, not in `Unit.identifier`.
+payment requirements, not in `Unit.identifier`. A payment adapter must apply
+the selected rail's asset mapping; it must not copy `Unit.identifier` into a
+protocol asset field. For example, `slip44:3030` maps to x402 Hedera asset
+`0.0.0`, while retaining the exact amount and scale.
 
 HTS fungible tokens are distinct assets rather than denominations of native
 HBAR. They should use a chain-scoped identifier (for example a CAIP-19 asset
