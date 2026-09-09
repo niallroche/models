@@ -32,7 +32,7 @@
         <accord-money:preciseAmount unscaledValue="50000">
           <accord-money:unit code="HBAR" scheme="slip44" identifier="3030" scale="8"/>
         </accord-money:preciseAmount>
-        <accepts type="application/x402+json"><![CDATA[{"network":"hedera:testnet","scheme":"exact"}]]></accepts>
+        <accepts type="application/x402+json"><![CDATA[{"network":"hedera:testnet","scheme":"exact","asset":"0.0.0"}]]></accepts>
       </payment>
       <legal type="warranty">ownership authority no-infringement</legal>
       <legal type="disclaimer">as-is no-warranty</legal>

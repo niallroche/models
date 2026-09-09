@@ -219,6 +219,9 @@ test('core amount stays ISO while the Accord extension carries exact HBAR', () =
 
     const hbarPayment = example();
     const preciseAmount = hbarPayment.contents[0].licenses[0].payment.preciseAmount;
+    const slip44Registry = JSON.parse(
+        fs.readFileSync(path.join(repoRoot, 'data', 'slip44.json'), 'utf8'),
+    );
     assert.equal(preciseAmount.unscaledValue, '50000');
     assert.deepEqual(preciseAmount.unit, {
         $class: 'org.accordproject.money@1.0.0.Unit',
@@ -227,9 +230,10 @@ test('core amount stays ISO while the Accord extension carries exact HBAR', () =
         identifier: '3030',
         scale: 8,
     });
+    assert.deepEqual(preciseAmount.unit, slip44Registry.units.HBAR);
     assert.equal(
         hbarPayment.contents[0].licenses[0].payment.accepts.metadata,
-        '{"network":"hedera:testnet","scheme":"exact"}',
+        '{"network":"hedera:testnet","scheme":"exact","asset":"0.0.0"}',
     );
     assert.doesNotThrow(() => s.fromJSON(hbarPayment));
 
@@ -269,7 +273,7 @@ test('the XML exemplar fixes the Accord precise-amount QName and representation'
         xml,
         /<accord-money:unit code="HBAR" scheme="slip44" identifier="3030" scale="8"\/>/,
     );
-    assert.match(xml, /\{"network":"hedera:testnet","scheme":"exact"\}/);
+    assert.match(xml, /\{"network":"hedera:testnet","scheme":"exact","asset":"0\.0\.0"\}/);
 });
 
 /**

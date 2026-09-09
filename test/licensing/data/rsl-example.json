@@ -39,7 +39,7 @@
             "accepts": {
               "$class": "org.accordproject.licensing.rsl@1.0.0.Accepts",
               "type": "application/x402+json",
-              "metadata": "{\"network\":\"hedera:testnet\",\"scheme\":\"exact\"}"
+              "metadata": "{\"network\":\"hedera:testnet\",\"scheme\":\"exact\",\"asset\":\"0.0.0\"}"
             }
           },
           "legal": {

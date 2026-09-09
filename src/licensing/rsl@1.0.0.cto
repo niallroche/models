@@ -226,9 +226,12 @@ concept Payment {
   o String custom optional
   o Amount amount optional
   // Accord extension for an exact fiat, native-chain or token amount. In XML
-  // this is the accord-money:preciseAmount foreignElement defined in note 4,
-  // not an element in the RSL namespace. For HBAR, for example: code="HBAR",
-  // scheme="slip44", identifier="3030", scale=8.
+// this is the accord-money:preciseAmount foreignElement defined in note 4,
+// not an element in the RSL namespace. For HBAR, for example: code="HBAR",
+// scheme="slip44", identifier="3030", scale=8. Hedera's x402 asset value
+// "0.0.0" identifies native HBAR on that settlement rail; it belongs in the
+// payment-protocol metadata rather than replacing this cross-chain unit id.
+// HTS tokens are not native HBAR and require their own chain-scoped identity.
   o PreciseAmount preciseAmount optional
   o Accepts accepts optional
 }
