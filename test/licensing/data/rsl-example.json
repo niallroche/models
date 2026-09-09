@@ -25,10 +25,21 @@
             "$class": "org.accordproject.licensing.rsl@1.0.0.Payment",
             "type": "USE",
             "custom": "https://example.com/licensing",
+            "preciseAmount": {
+              "$class": "org.accordproject.money@1.0.0.PreciseAmount",
+              "unscaledValue": "50000",
+              "unit": {
+                "$class": "org.accordproject.money@1.0.0.Unit",
+                "code": "HBAR",
+                "scheme": "slip44",
+                "identifier": "3030",
+                "scale": 8
+              }
+            },
             "accepts": {
               "$class": "org.accordproject.licensing.rsl@1.0.0.Accepts",
               "type": "application/x402+json",
-              "metadata": "{\"network\":\"eip155:84532\",\"scheme\":\"exact\"}"
+              "metadata": "{\"network\":\"hedera:testnet\",\"scheme\":\"exact\"}"
             }
           },
           "legal": {

@@ -68,6 +68,21 @@ function example() {
     return JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'rsl-example.json'), 'utf8'));
 }
 
+function assertAdapterPaymentChoices(document) {
+    for (const content of document.contents) {
+        for (const licence of content.licenses) {
+            const payment = licence.payment;
+            if (!payment) continue;
+            if (payment.type !== undefined && payment.typeExtension !== undefined) {
+                throw new Error('Payment.type and Payment.typeExtension are mutually exclusive');
+            }
+            if (payment.amount !== undefined && payment.preciseAmount !== undefined) {
+                throw new Error('Payment.amount and Payment.preciseAmount are mutually exclusive');
+            }
+        }
+    }
+}
+
 test('the model compiles', () => {
     assert.doesNotThrow(() => modelManager());
 });
@@ -202,37 +217,20 @@ test('core amount stays ISO while the Accord extension carries exact HBAR', () =
         'org.accordproject.money@1.0.0.PreciseAmount',
     );
 
-    const hbarPayment = {
-        $class: `${NS}.RslDocument`,
-        contents: [{
-            $class: `${NS}.Content`,
-            url: '/',
-            licenses: [{
-                $class: `${NS}.LicenseTerms`,
-                permitsUsage: ['AI_INPUT'],
-                payment: {
-                    $class: `${NS}.Payment`,
-                    type: 'USE',
-                    preciseAmount: {
-                        $class: 'org.accordproject.money@1.0.0.PreciseAmount',
-                        unscaledValue: '100000000',
-                        unit: {
-                            $class: 'org.accordproject.money@1.0.0.Unit',
-                            code: 'HBAR',
-                            scheme: 'slip44',
-                            identifier: '3030',
-                            scale: 8,
-                        },
-                    },
-                    accepts: {
-                        $class: `${NS}.Accepts`,
-                        type: 'application/x402+json',
-                        metadata: '{"network":"hedera:mainnet","scheme":"exact"}',
-                    },
-                },
-            }],
-        }],
-    };
+    const hbarPayment = example();
+    const preciseAmount = hbarPayment.contents[0].licenses[0].payment.preciseAmount;
+    assert.equal(preciseAmount.unscaledValue, '50000');
+    assert.deepEqual(preciseAmount.unit, {
+        $class: 'org.accordproject.money@1.0.0.Unit',
+        code: 'HBAR',
+        scheme: 'slip44',
+        identifier: '3030',
+        scale: 8,
+    });
+    assert.equal(
+        hbarPayment.contents[0].licenses[0].payment.accepts.metadata,
+        '{"network":"hedera:testnet","scheme":"exact"}',
+    );
     assert.doesNotThrow(() => s.fromJSON(hbarPayment));
 
     const invalidCoreAmount = structuredClone(hbarPayment);
@@ -241,6 +239,37 @@ test('core amount stays ISO while the Accord extension carries exact HBAR', () =
         $class: `${NS}.Amount`, currency: 'HBAR', value: '1.00',
     };
     assert.throws(() => s.fromJSON(invalidCoreAmount), /currency/);
+});
+
+test('adapter payment-choice invariants reject ambiguous values', () => {
+    assert.doesNotThrow(() => assertAdapterPaymentChoices(example()));
+
+    const ambiguousType = structuredClone(example());
+    ambiguousType.contents[0].licenses[0].payment.typeExtension = 'acme:metered';
+    assert.throws(
+        () => assertAdapterPaymentChoices(ambiguousType),
+        /type and Payment\.typeExtension are mutually exclusive/,
+    );
+
+    const ambiguousAmount = structuredClone(example());
+    ambiguousAmount.contents[0].licenses[0].payment.amount = {
+        $class: `${NS}.Amount`, currency: 'USD', value: '0.01',
+    };
+    assert.throws(
+        () => assertAdapterPaymentChoices(ambiguousAmount),
+        /amount and Payment\.preciseAmount are mutually exclusive/,
+    );
+});
+
+test('the XML exemplar fixes the Accord precise-amount QName and representation', () => {
+    const xml = fs.readFileSync(path.join(__dirname, 'data', 'rsl-example.xml'), 'utf8');
+    assert.match(xml, /xmlns:accord-money="https:\/\/models\.accordproject\.org\/money@1\.0\.0"/);
+    assert.match(xml, /<accord-money:preciseAmount unscaledValue="50000">/);
+    assert.match(
+        xml,
+        /<accord-money:unit code="HBAR" scheme="slip44" identifier="3030" scale="8"\/>/,
+    );
+    assert.match(xml, /\{"network":"hedera:testnet","scheme":"exact"\}/);
 });
 
 /**

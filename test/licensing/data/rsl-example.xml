@@ -15,19 +15,24 @@
   Note what is absent. There is no `server` attribute: when one is present a
   client MUST obtain a licence from that OLP server before access, even for a
   free licence (section 3.3), so it must not be advertised unless it is
-  implemented. And the first licence carries no <amount>: the price is
-  denominated on a token rail, which ISO 4217 cannot express, so it is reached
-  through <accepts>, where section 3.11 provides for authoritative pricing to be
-  supplied by the payment protocol at runtime.
+  implemented. The first licence carries no RSL Core <amount>: HBAR is not ISO
+  4217. It instead carries Accord's typed foreign extension and retains
+  <accepts>, where section 3.11 provides the payment-protocol route for RSL Core
+  clients that do not recognise that extension.
 -->
-<rsl xmlns="https://rslstandard.org/rsl" max-age="30">
+<rsl xmlns="https://rslstandard.org/rsl"
+     xmlns:accord-money="https://models.accordproject.org/money@1.0.0"
+     max-age="30">
   <content url="/reports/digital-assets-outlook-2026">
     <license>
       <permits type="usage">search ai-input ai-index</permits>
       <permits type="user">commercial non-commercial education government personal</permits>
       <payment type="use">
         <custom>https://example.com/licensing</custom>
-        <accepts type="application/x402+json"><![CDATA[{"network":"eip155:84532","scheme":"exact"}]]></accepts>
+        <accord-money:preciseAmount unscaledValue="50000">
+          <accord-money:unit code="HBAR" scheme="slip44" identifier="3030" scale="8"/>
+        </accord-money:preciseAmount>
+        <accepts type="application/x402+json"><![CDATA[{"network":"hedera:testnet","scheme":"exact"}]]></accepts>
       </payment>
       <legal type="warranty">ownership authority no-infringement</legal>
       <legal type="disclaimer">as-is no-warranty</legal>

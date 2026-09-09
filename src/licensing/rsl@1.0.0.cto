@@ -71,6 +71,19 @@ import org.accordproject.money@1.0.0.{CurrencyCode, PreciseAmount} from https://
 //     <accepts> so a core RSL client can obtain authoritative pricing and
 //     settlement instructions through the named protocol.
 //
+//     The canonical XML binding for this field is the foreign element
+//     `{https://models.accordproject.org/money@1.0.0}preciseAmount`, conventionally
+//     prefixed `accord-money`. `unscaledValue` is an attribute on that element;
+//     its single `accord-money:unit` child carries the `code`, `scheme`,
+//     optional `identifier`, and `scale` attributes. See rsl-example.xml.
+//
+//  5. Payment has two exclusive choices that Concerto cannot express without
+//     changing the direct projection of RSL Core: type versus typeExtension,
+//     and amount versus preciseAmount. A polymorphic PaymentAmount supertype
+//     could enforce the latter, but would replace RSL's specified `amount`
+//     property with a wrapper/discriminator shape. This model preserves the
+//     RSL Core property unchanged; adapters MUST enforce both exclusive choices.
+//
 // What this model cannot enforce, and an adapter must:
 //
 //   - Appendix A requires `content+` in <rsl>, `license+` in <content>, and one
@@ -213,8 +226,9 @@ concept Payment {
   o String custom optional
   o Amount amount optional
   // Accord extension for an exact fiat, native-chain or token amount. In XML
-  // this is a foreignElement, not an element in the RSL namespace. For HBAR,
-  // for example: code="HBAR", scheme="slip44", identifier="3030", scale=8.
+  // this is the accord-money:preciseAmount foreignElement defined in note 4,
+  // not an element in the RSL namespace. For HBAR, for example: code="HBAR",
+  // scheme="slip44", identifier="3030", scale=8.
   o PreciseAmount preciseAmount optional
   o Accepts accepts optional
 }
